@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} {% endblock %}</title>
+  <!-- Подключаем Bootstrap CSS -->
+  <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/style.css">
+  <style>
+ 
+  </style>
+</head>
+<body>
+
+  <!-- Шапка сайта -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="/">Эко-Ферма</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+          <li class="nav-item"><a class="nav-link" href="/catalog">Каталог</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">О нас</a></li>
+          <li class="nav-item"><a class="nav-link" href="/services">Доставка и оплата</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contacts">Контакты</a></li>
+        </ul>
+        <form class="d-flex" action="/catalog" method="get">
+          <input class="form-control me-2" type="search" name="search" placeholder="Поиск">
+          <button class="btn btn-outline-success"  type="submit">Найти</button>
+        </form>
+        {%if 'name' in session and active_user %}
+        <a href="/cart" class="btn btn-primary ms-3">Корзина ({{order_count}})</a>
+        <a href="/logout" class="btn btn-outline-danger ms-3">Выйти</a>
+        {% else %}
+        <a href="/login" class="btn btn-outline-primary ms-3">Вход</a>
+        {%endif%}
+      </div>
+    </div>
+  </nav>
+
+<main>
+    {% block main %} {% endblock %}
+</main>
+ 
+
+  <!-- Подвал -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Контакты</h5>
+          <p>Адрес: ул. Курчатова, 4, г. Гродно, Беларусь</p>
+          <p>Телефон: +375 (29) 111-22-33</p>
+          <p>Email: info@eco-ferma.by</p>
+        </div>
+        <div class="col-md-4">
+          <h5>Социальные сети</h5>
+          <a href="https://www.instagram.com/" class="btn btn-outline-dark me-2">Instagram</a>
+          <a href="https://www.facebook.com/" class="btn btn-outline-dark me-2">Facebook</a>
+          <a href="https://vk.com/" class="btn btn-outline-dark me-2">VK</a>
+        </div>
+        <div class="col-md-4">
+          <h5>Полезные ссылки</h5>
+          <ul class="list-unstyled">
+            <li><a href="/about">Политика конфиденциальности</a></li>
+            <li><a href="/services">Возврат товара</a></li>
+            <li><a href="/contacts">Партнерам</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <p>© 2025 Эко-Ферма.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Подключаем Bootstrap JS -->
+  <script src="../static/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/js/index.js"></script>
+</body>
+</html>

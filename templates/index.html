@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}
+Эко-Ферма
+{% endblock %}
+
+{% block main %}
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <h1 class="display-4">Свежие эко-продукты от фермеров с любовью!</h1>
+      <p class="lead">Натуральные продукты для вашего стола и всё необходимое для фермеров.</p>
+      <a href="/catalog" class="btn btn-success btn-lg">Перейти в каталог</a>
+      <a href="/about" class="btn btn-outline-light btn-lg">Узнать больше</a>
+    </div>
+  </section>
+
+  <!-- Преимущества -->
+  <section class="container my-5">
+    <h2 class="text-center mb-4">Почему выбирают нас?</h2>
+    <div class="row text-center">
+      <div class="col-md-3">
+        <h3>🌿</h3>
+        <p>100% натуральные продукты</p>
+      </div>
+      <div class="col-md-3">
+        <h3>🚚</h3>
+        <p>Быстрая доставка по региону</p>
+      </div>
+      <div class="col-md-3">
+        <h3>🌍</h3>
+        <p>Поддержка местных фермеров</p>
+      </div>
+      <div class="col-md-3">
+        <h3>💚</h3>
+        <p>Экологичная упаковка</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Популярные категории -->
+  <section class="container my-5">
+    <h2 class="text-center mb-4">Наши категории</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="category-card">
+          <img src="../static/img/1.jpg" alt="Овощи и фрукты">
+          <h3 class="text-center mt-3">Свежие овощи и фрукты</h3>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="category-card">
+          <img src="../static/img/2.jpg" alt="Молочные продукты">
+          <h3 class="text-center mt-3">Молочные продукты</h3>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="category-card">
+          <img src="../static/img/3.jpg" alt="Мясо и птица">
+          <h3 class="text-center mt-3">Мясо и птица</h3>
+        </div>
+      </div>
+      <div class="col-md-12 mb-4"></div>
+        <div class="category-card">
+          <img src="../static/img/4.jpg" alt="Товары для фермеров">
+          <h3 class="text-center mt-3">Товары для фермеров</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Хиты продаж -->
+  <section class="container my-5">
+    <h2 class="text-center mb-4">Популярные товары</h2>
+    <div class="row">
+      {%for product in random_products%}
+      <div class="col-md-3 mb-4">
+        <div class="product-card">
+          <img src="../static/img/upload/{{product.image_name}}" alt="{{product.title}}">
+          <h4 class="text-center mt-3">{{product.title}}</h4>
+          <p class="text-center"><small>{{product.category}}</small></p>
+          <p class="text-center">{{product.price}}{%if not product.title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
+          <a href="/product/{{product.id}}" class="btn btn-success w-100">Просмотр</a>
+        </div>
+      </div>
+      {%endfor%}
+    </div>
+  </section>
+  {% endblock %}
+ 

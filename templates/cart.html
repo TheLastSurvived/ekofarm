@@ -1,0 +1,150 @@
+{% extends 'base.html' %} 
+{% block title %} Корзина | Эко-Ферма {% endblock %}
+{% block main %}
+<!-- Основной контент -->
+<div class="cart-container">
+    <h2 class="text-center mb-4">Корзина</h2>
+    {% with messages = get_flashed_messages(True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="m-2 flash {{category}} text-center">{{message}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <button class="btn btn-success w-50 mb-3 d-block mx-auto" data-bs-toggle="modal" data-bs-target="#exampleModal1">Просмотреть чеки</button>
+
+    <!-- Модальное окно для оформления заказа -->
+    <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Чеки</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {%if reports%}
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Id чека</th>
+                            <th scope="col">Ссылка на чек</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {%for report in reports%}
+                          <tr>
+                            <th scope="row">{{report.id}}</th>
+                            <td><a href="../static/pdf_reports/{{report.pdf}}" target="_blank">{{report.pdf}}</a></td>
+                          </tr>
+                        {%endfor%}
+                        </tbody>
+                      </table>
+                      {%else%}
+                        <p class="text-center">Вы не делали заказов!</p>
+                      {%endif%}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+    <!-- Список товаров в корзине -->
+    <div class="cart-items">
+        {% if orders %}
+           
+            {% for order in orders %}
+                {% if order.status == 0 %}
+                   
+                    <div class="cart-item d-flex align-items-center">
+                        <img src="../static/img/upload/{{order.product.image_name}}" alt="{{order.product.title}}" class="me-3">
+                        <div class="details flex-grow-1">
+                            <h5 class="mb-0">{{order.product.title}}</h5>
+                            <p class="mb-0">{{order.product.price}} {% if not order.product.title == "Свежее молоко" %}руб/кг{% else %}руб/л{% endif %}</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <p class="price mb-0 me-1">{{order.count_products}} x</p>
+                            <p class="price mb-0 me-3">{{order.product.price}} {% if not order.product.title == "Свежее молоко" %}руб/кг{% else %}руб/л{% endif %}</p>
+                            <a href="/delete-order/{{order.id}}" class="btn btn-danger">Удалить</a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p class="text-center">Корзина пуста!</p>
+        {% endif %}
+    </div>
+
+    <!-- Итоговая сумма и кнопка "Оформить заказ" -->
+   {%if total_sum%}
+        <div class="cart-summary">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4>Итого:</h4>
+                <p class="total">{{total_sum}} руб</p>
+            </div>
+            <button class="btn btn-success btn-lg w-100" data-bs-toggle="modal" data-bs-target="#exampleModal">Оформить заказ</button>
+
+            <!-- Модальное окно для оформления заказа -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Оформление заказа</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="/buy_all">
+                                <div class="mb-3">
+                                    <label for="disabledTextInput" class="form-label">Это ваша почта?</label>
+                                    <input type="email" id="disabledTextInput" value="{{active_user.email}}" class="form-control" name="email" placeholder="Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="disabledTextInput" class="form-label">Укажите вас адрес</label>
+                                    <input type="text" id="disabledTextInput" value="" class="form-control" name="address" placeholder="Адрес" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="disabledTextInput" class="form-label">Укажите ваш номер телефона</label>
+                                    <input type="number" id="disabledTextInput" value="" class="form-control" name="phone_number" placeholder="Номер телефона" required>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Закрыть</button>
+                            <button type="submit" class="btn btn-success">Подтвердить</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {%else%}
+        <p class="text-center"></p>
+    {%endif%}
+</div>
+
+<!-- Список оформленных заказов -->
+<div class="cart-container">
+    <div class="cart-items">
+        {% if orders %}
+            {% for order in orders %}
+                {% if order.status == 1 %}
+                    <div class="cart-item d-flex align-items-center">
+                        <img src="../static/img/upload/{{order.product.image_name}}" alt="{{order.product.title}}" class="me-3">
+                        <div class="details flex-grow-1">
+                            <h5 class="mb-0">{{order.product.title}}</h5>
+                            <p class="mb-0">{{order.product.price}} {% if not order.product.title == "Свежее молоко" %}руб/кг{% else %}руб/л{% endif %}</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <p class="price mb-0 me-1">{{order.count_products}} x</p>
+                            <p class="price mb-0 me-3">{{order.product.price}} {% if not order.product.title == "Свежее молоко" %}руб/кг{% else %}руб/л{% endif %}</p>
+                            <p class="price mb-0 text-success">ОФОРМЛЕНО</p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p class="text-center">Вы ничего не заказывли!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

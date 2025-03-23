@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}
+Контакты | Эко-Ферма 
+{% endblock %}
+
+
+{% block main %}
+<!-- Основной контент -->
+<div class="container my-5">
+    <h1 class="text-center mb-4">Контакты</h1>
+    <div class="row">
+      <!-- Контактная информация -->
+      <div class="col-md-6">
+        <div class="contact-info">
+          <h3>Наши контакты</h3>
+          <p><strong>Адрес:</strong> ул. Курчатова, 4, г. Гродно, Республика Беларусь</p>
+          <p><strong>Телефон:</strong> +375 (29) 111-22-33</p>
+          <p><strong>Email:</strong> info@eco-ferma.by</p>
+          <p><strong>Режим работы:</strong> Пн-Пт: 9:00 - 18:00, Сб-Вс: выходной</p>
+        </div>
+      </div>
+
+      <!-- Карта -->
+      <div class="col-md-6">
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1769.3657189183864!2d23.81463101905804!3d53.70365565827196!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46e078ba1621be5f%3A0xc26a937527f8e3f3!2z0YPQuy4g0JrRg9GA0YfQsNGC0L7QstCwIDQsINCT0YDQvtC00L3Qviwg0JPRgNC-0LTQvdC10L3RgdC60LDRjyDQvtCx0LvQsNGB0YLRjA!5e0!3m2!1sru!2sby!4v1742586253316!5m2!1sru!2sby" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>        </div>
+      </div>
+    </div>
+
+    <!-- Форма обратной связи -->
+    <div class="row mt-5">
+      <div class="col">
+        <h3>Обратная связь</h3>
+        <form>
+          <div class="mb-3">
+            <label for="name" class="form-label">Ваше имя</label>
+            <input type="text" class="form-control" id="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Ваш email</label>
+            <input type="email" class="form-control" id="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="message" class="form-label">Сообщение</label>
+            <textarea class="form-control" id="message" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-success">Отправить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

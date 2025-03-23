@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}
+{{product.title}} | Эко-Ферма
+{% endblock %}
+
+{% block main %}
+{{ ckeditor.load() }}
+  <!-- Основной контент -->
+  <div class="container my-5">
+    {%if 'name' in session and active_user.root==1%}
+    <button
+      type="button"
+      class="btn btn-success mb-3"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
+      Изменить
+    </button>
+    <a href="/delete-product/{{product.id}}" class="btn btn-danger mb-3">Удалить</a>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Изменить запись</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="post" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label for="disabledTextInput" class="form-label">Название</label>
+                <input type="text" value="{{product.title}}" id="disabledTextInput" class="form-control" name="title" placeholder="Название"
+                  required>
+              </div>
+              <div class="mb-3">
+                <label for="disabledTextInput" class="form-label">Текст под названия</label>
+                <input type="text" id="disabledTextInput" class="form-control" value="{{product.subText}}" name="subText" placeholder="Текст для названия"
+                  required>
+              </div>
+              <div class="mb-3">
+                <label for="disabledTextInput" class="form-label">Категория</label>
+                <select class="form-select" id="category" name="category">
+                  <option value="Овощи и фрукты">Овощи и фрукты</option>
+                  <option value="Молочные продукты">Молочные продукты</option>
+                  <option value="Мясо и птица">Мясо и птица</option>
+                  <option value="Товары для фермеров">Товары для фермеров</option>
+                </select>
+              </div>
+  
+              <div class="mb-3">
+                <label for="disabledTextInput" class="form-label">Цена за 1 кг. руб.</label>
+                <input type="number" value="{{product.price}}" id="disabledTextInput" class="form-control" name="price" placeholder="Цена"
+                  required>
+              </div>
+        
+              <div class="mb-3">
+                <label for="disabledTextInput" class="form-label">Изображение</label>
+                <input type="file" id="disabledTextInput" name="image" class="form-control" accept=".jpg,.jpeg,.png"
+                  >
+              </div>
+              <div class="mb-3">
+                <h3>Содержимое</h3>
+                {{ ckeditor.create(value=product.text) }}
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Закрыть</button>
+            <button type="submit" class="btn btn-success">Изменить запись</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {%endif%}
+    {% with messages = get_flashed_messages(True) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <p class="m-2 flash {{category}}">{{message}}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="row">
+      <!-- Изображения товара -->
+      <div class="col-md-6">
+        <div class="product-images">
+          <img src="../static/img/upload/{{product.image_name}}" alt="{{product.title}}" class="main-image">
+          <!--   <div class="row">
+            <div class="col-4">
+              <img src="../static/img/product/2.jpg" alt="Органические яблоки 1" class="thumbnail">
+            </div>
+            <div class="col-4">
+              <img src="../static/img/product/3.jpg" alt="Органические яблоки 2" class="thumbnail">
+            </div>
+            <div class="col-4">
+              <img src="../static/img/product/4.jpg" alt="Органические яблоки 3" class="thumbnail">
+            </div>
+          </div>--> 
+        </div>
+      </div>
+
+      <!-- Информация о товаре -->
+      <div class="col-md-6">
+        <div class="product-info">
+          <h1>{{product.title}}</h1>
+          <p class="text-muted">Категория: {{product.category}}</p>
+          <p class="price">{{product.price}} {%if not product.title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
+          <p>{{product.subText}}</p>
+          {%if 'name' in session %}
+          <form method="post" action="{{url_for('add_to_cart', id_user=active_user.id, id_product=product.id)}}">
+            <div class="mb-3">
+              <label for="quantity" class="form-label">Количество</label>
+              <input type="number" name="count_products" class="form-control quantity" id="quantity" value="1" min="1">
+            </div>
+           
+            <button type="submit" class="btn btn-success btn-lg w-100">Добавить в корзину</button>
+            {%else%}
+            <button type="submit" class="btn btn-success btn-lg w-100" disabled>Добавить в корзину</button>
+            <p class="text-center my-2">Для добавления в карзину необходимо <a href="/login" class="link-dark">войти!</a> </p>
+            {%endif%}
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Дополнительная информация о товаре -->
+    <div class="row mt-5">
+      <div class="col">
+        {% autoescape false %} {{product.text}} {% endautoescape %}
+      </div>
+    </div>
+  </div>
+
+ 
+
+ 
+  {% endblock %}

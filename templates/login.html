@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}
+Вход | Эко-Ферма
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="login-form">
+        <h2>Авторизация</h2>
+        {% with messages = get_flashed_messages(True) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <p class="m-2 flash {{category}} text-center">{{message}}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <form  method="post">
+          <!-- Поле для email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Введите ваш email" required>
+          </div>
+          <!-- Поле для пароля -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Пароль</label>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Введите ваш пароль" required>
+          </div>
+          <!-- Кнопка входа -->
+          <button type="submit" class="btn btn-success">Войти</button>
+          <!-- Ссылки на восстановление пароля и регистрацию -->
+          <div class="links mt-3">
+            <p>Не профиля? <a href="/reg">Регистрация</a></p>
+          </div>
+        </form>
+      </div>
+</div>
+{% endblock %}

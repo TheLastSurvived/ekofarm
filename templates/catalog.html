@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% block title %}
+Каталог | Эко-Ферма 
+{% endblock %}
+
+
+{% block main %}
+{{ ckeditor.load() }}
+<!-- Основной контент -->
+<div class="container my-5">
+  {%if 'name' in session and active_user.root==1%}
+  <button
+  type="button"
+  class="btn btn-success mb-3"
+  data-bs-toggle="modal"
+  data-bs-target="#exampleModal"
+>
+  Добавить запись
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Добавить запись</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="disabledTextInput" class="form-label">Название</label>
+            <input type="text" id="disabledTextInput" class="form-control" name="title" placeholder="Название"
+              required>
+          </div>
+          <div class="mb-3">
+            <label for="disabledTextInput" class="form-label">Текст под названия</label>
+            <input type="text" id="disabledTextInput" class="form-control" name="subText" placeholder="Текст для названия"
+              required>
+          </div>
+          <div class="mb-3">
+            <label for="disabledTextInput" class="form-label">Категория</label>
+            <select class="form-select" id="category" name="category">
+              <option value="Овощи и фрукты">Овощи и фрукты</option>
+              <option value="Молочные продукты">Молочные продукты</option>
+              <option value="Мясо и птица">Мясо и птица</option>
+              <option value="Товары для фермеров">Товары для фермеров</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="disabledTextInput" class="form-label">Цена за 1 кг. руб.</label>
+            <input type="number" id="disabledTextInput" class="form-control" name="price" placeholder="Цена"
+              required>
+          </div>
+    
+          <div class="mb-3">
+            <label for="disabledTextInput" class="form-label">Изображение</label>
+            <input type="file" id="disabledTextInput" name="image" class="form-control" accept=".jpg,.jpeg,.png"
+              required>
+          </div>
+          <div class="mb-3">
+            <h3>Описание</h3>
+            {{ ckeditor.create() }}
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Закрыть</button>
+        <button type="submit" class="btn btn-success">Добавить запись</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+{%endif%}
+{% with messages = get_flashed_messages(True) %}
+{% if messages %}
+{% for category, message in messages %}
+<p class="m-2 flash {{category}}">{{message}}</p>
+{% endfor %}
+{% endif %}
+{% endwith %}
+  <div class="row">
+    <!-- Сайдбар с фильтрами -->
+    <div class="col-md-3">
+      <div class="sidebar">
+        <h5>Фильтры</h5>
+        <form method="get">
+          <div class="mb-3">
+            <label for="category" class="form-label">Категория</label>
+            <select class="form-select" id="category" name="category">
+              <option value="">Все</option>
+              <option value="Овощи и фрукты">Овощи и фрукты</option>
+              <option value="Молочные продукты">Молочные продукты</option>
+              <option value="Мясо и птица">Мясо и птица</option>
+              <option value="Товары для фермеров">Товары для фермеров</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="priceRange" class="form-label">Цена</label>
+            <input
+              type="range"
+              class="form-range"
+              id="priceRange"
+              min="1"
+              max="{{max_price}}"
+              oninput="updateValue(this.value)"
+              name="maxprice"
+              value="{{max_price}}"
+            />
+            <p>До: <span id="rangeValue">{{max_price}}</span></p>
+        </div>
+          <button type="submit" class="btn btn-success w-100">Применить</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Список товаров -->
+    <div class="col-md-9">
+      <h2>Каталог товаров</h2>
+      <div class="row">
+        {%if search%}
+  <p class="h5">Результаты поиска по запросу: {{search.replace('%', '').lower()}}</p>
+{%endif%}
+
+{%if not products%}
+  <h6>Список пуст!</h6>
+{%endif%}
+        <!-- Карточка товара 1 -->
+         {%for product in products%}
+        <div class="col-md-4 mb-4">
+          <div class="card product-card">
+            <img
+              src="../static/img/upload/{{product.image_name}}"
+              alt="{{product.title}}"
+            />
+            <div class="card-body">
+              <h5 class="card-title">{{product.title}}</h5>
+              <p class="card-text"><small>{{product.category}}</small>
+              <p class="card-text">{{product.price}} {%if not product.title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
+              
+              <a href="/product/{{product.id}}" class="btn btn-success w-100">Просмотр</a>
+            </div>
+          </div>
+        </div>
+        {%endfor%}
+      </div>
+
+      <!-- Пагинация 
+      <nav aria-label="Навигация по страницам">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#">Назад</a>
+          </li>
+          <li class="page-item active">
+            <a class="page-link" href="#">1</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Вперед</a>
+          </li>
+        </ul>
+      </nav>-->
+    </div>
+  </div>
+</div>
+{% endblock %}

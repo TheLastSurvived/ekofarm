@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Чек от {{orders[0].date.strftime('%d.%m.%Y %H:%M') }}</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Report  {{orders[0].date.strftime('%d.%m.%Y %H:%M') }}</h1>
+    <div class="cart-container">
+        <div class="cart-items">
+                {% for order in orders %}
+                    {% if order.status == 0 %}
+                       
+                        <div class="cart-item d-flex align-items-center">
+                            <img src="../static/img/upload/{{order.product.image_name}}" alt="{{order.product.title}}" class="me-3">
+                            <div class="details flex-grow-1">
+                                <h5 class="mb-0">{{order.product.title}}</h5>
+                                <p class="mb-0">{{order.product.price}} {% if not order.product.title == "Свежее молоко" %}руб/кг{% else %}руб/л{% endif %}</p>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <p class="price mb-0 me-1">{{order.count_products}} x</p>
+                                <p class="price mb-0 me-3">{{order.product.price}} {% if not order.product.title == "Свежее молоко" %}руб/кг{% else %}руб/л{% endif %}</p>
+                                <a href="/delete-order/{{order.id}}" class="btn btn-danger">Удалить</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+        </div>
+    </div>
+  </body>
+</html>
