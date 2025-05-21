@@ -86,15 +86,15 @@
         <h5>Фильтры</h5>
         <form method="get">
           <div class="mb-3">
-            <label for="category" class="form-label">Категория</label>
-            <select class="form-select" id="category" name="category">
-              <option value="">Все</option>
-              <option value="Овощи и фрукты">Овощи и фрукты</option>
-              <option value="Молочные продукты">Молочные продукты</option>
-              <option value="Мясо и птица">Мясо и птица</option>
-              <option value="Товары для фермеров">Товары для фермеров</option>
-            </select>
-          </div>
+          <label for="category" class="form-label">Категория</label>
+          <select class="form-select" id="category" name="category">
+            <option value="">Все</option>
+            <option value="Овощи и фрукты" {% if request.args.get('category') == 'Овощи и фрукты' %}selected{% endif %}>Овощи и фрукты</option>
+            <option value="Молочные продукты" {% if request.args.get('category') == 'Молочные продукты' %}selected{% endif %}>Молочные продукты</option>
+            <option value="Мясо и птица" {% if request.args.get('category') == 'Мясо и птица' %}selected{% endif %}>Мясо и птица</option>
+            <option value="Товары для фермеров" {% if request.args.get('category') == 'Товары для фермеров' %}selected{% endif %}>Товары для фермеров</option>
+          </select>
+        </div>
           <div class="mb-3">
             <label for="priceRange" class="form-label">Цена</label>
             <input
@@ -105,11 +105,12 @@
               max="{{max_price}}"
               oninput="updateValue(this.value)"
               name="maxprice"
-              value="{{max_price}}"
+              value="{{ request.args.get('maxprice', max_price) }}"
             />
-            <p>До: <span id="rangeValue">{{max_price}}</span></p>
-        </div>
+            <p>До: <span id="rangeValue">{{ request.args.get('maxprice', max_price) }} руб.</span></p>
+          </div>
           <button type="submit" class="btn btn-success w-100">Применить</button>
+          <a href="/catalog" class="btn btn-danger w-100 mt-2">Сбросить</a>
         </form>
       </div>
     </div>
@@ -117,16 +118,17 @@
     <!-- Список товаров -->
     <div class="col-md-9">
       <h2>Каталог товаров</h2>
+
       <div class="row">
         {%if search%}
-  <p class="h5">Результаты поиска по запросу: {{search.replace('%', '').lower()}}</p>
-{%endif%}
+          <p class="h5">Результаты поиска по запросу: {{search.replace('%', '').lower()}}</p>
+        {%endif%}
 
-{%if not products%}
-  <h6>Список пуст!</h6>
-{%endif%}
+        {%if not products%}
+          <h6>Список пуст!</h6>
+        {%endif%}
         <!-- Карточка товара 1 -->
-         {%for product in products%}
+         {%for product in products.items%}
         <div class="col-md-4 mb-4">
           <div class="card product-card">
             <img
@@ -145,22 +147,36 @@
         {%endfor%}
       </div>
 
-      <!-- Пагинация 
-      <nav aria-label="Навигация по страницам">
-        <ul class="pagination justify-content-center">
-          <li class="page-item disabled">
-            <a class="page-link" href="#">Назад</a>
-          </li>
-          <li class="page-item active">
-            <a class="page-link" href="#">1</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#">Вперед</a>
-          </li>
-        </ul>
-      </nav>-->
+     <!-- Пагинация -->
+    {% if products.pages > 1 %}
+    <nav aria-label="Навигация по страницам">
+      <ul class="pagination justify-content-center">
+        <li class="page-item {% if not products.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('catalog', page=products.prev_num, category=request.args.get('category'), maxprice=request.args.get('maxprice'), search=request.args.get('search')) }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        
+        {% for page_num in products.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+          {% if page_num %}
+            <li class="page-item {% if page_num == products.page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('catalog', page=page_num, category=request.args.get('category'), maxprice=request.args.get('maxprice'), search=request.args.get('search')) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+          {% endif %}
+        {% endfor %}
+        
+        <li class="page-item {% if not products.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('catalog', page=products.next_num, category=request.args.get('category'), maxprice=request.args.get('maxprice'), search=request.args.get('search')) }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    {% endif %}
     </div>
   </div>
 </div>

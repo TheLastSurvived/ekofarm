@@ -40,10 +40,10 @@
               <div class="mb-3">
                 <label for="disabledTextInput" class="form-label">Категория</label>
                 <select class="form-select" id="category" name="category">
-                  <option value="Овощи и фрукты">Овощи и фрукты</option>
-                  <option value="Молочные продукты">Молочные продукты</option>
-                  <option value="Мясо и птица">Мясо и птица</option>
-                  <option value="Товары для фермеров">Товары для фермеров</option>
+                  <option value="Овощи и фрукты" {%if product.category == 'Овощи и фрукты' %}selected{% endif %}>Овощи и фрукты</option>
+                  <option value="Молочные продукты" {%if product.category == 'Молочные продукты' %}selected{% endif %}>Молочные продукты</option>
+                  <option value="Мясо и птица" {%if product.category == 'Мясо и птица' %}selected{% endif %}>Мясо и птица</option>
+                  <option value="Товары для фермеров" {%if product.category == 'Товары для фермеров' %}selected{% endif %}>Товары для фермеров</option>
                 </select>
               </div>
   

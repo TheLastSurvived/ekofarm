@@ -172,3 +172,40 @@ body {
   font-weight: bold;
   color: #28a745;
 }
+
+
+.pagination {
+  margin-top: 20px;
+}
+
+.page-item.active .page-link {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.page-link {
+  color: #198754;
+}
+
+.page-link:hover {
+  color: #198754;
+}
+
+
+html, body {
+    height: 100%;
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Используем viewport height */
+  }
+  
+  .content {
+    flex: 1 0 auto; /* Это заставляет контент занимать всё доступное пространство */
+  }
+  
+  footer {
+    flex-shrink: 0; /* Предотвращает сжатие футера */
+  }

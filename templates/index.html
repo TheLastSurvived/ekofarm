@@ -79,7 +79,7 @@
           <img src="../static/img/upload/{{product.image_name}}" alt="{{product.title}}">
           <h4 class="text-center mt-3">{{product.title}}</h4>
           <p class="text-center"><small>{{product.category}}</small></p>
-          <p class="text-center">{{product.price}}{%if not product.title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
+          <p class="text-center">{{product.price}}{%if not product.title=="Свежее молоко"%} руб/кг {%else%} руб/л {%endif%}</p>
           <a href="/product/{{product.id}}" class="btn btn-success w-100">Просмотр</a>
         </div>
       </div>

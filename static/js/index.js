@@ -1,5 +1,5 @@
 function updateValue(value) {
-    document.getElementById('rangeValue').textContent = value;
+    document.getElementById('rangeValue').textContent = value + " руб.";
 }
 
 

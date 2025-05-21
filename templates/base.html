@@ -37,12 +37,13 @@
         <a href="/logout" class="btn btn-outline-danger ms-3">Выйти</a>
         {% else %}
         <a href="/login" class="btn btn-outline-primary ms-3">Вход</a>
+        <a href="/reg" class="btn btn-outline-secondary ms-3">Регистрация</a>
         {%endif%}
       </div>
     </div>
   </nav>
 
-<main>
+<main class="content">
     {% block main %} {% endblock %}
 </main>
  

@@ -121,10 +121,36 @@ def index():
     return render_template("index.html",random_products=random_products)
 
 
+PER_PAGE = 9
+
+
 @app.route('/catalog', methods=['GET', 'POST'])
 def catalog():
-    products = Products.query.all()
+    page = request.args.get('page', 1, type=int)
+    products_query = Products.query
+    
+    # Фильтрация
+    category = request.args.get('category')
+    search = request.args.get('search')
+    maxprice = request.args.get('maxprice')
+    
+    if category:
+        category = category.capitalize()
+        category = "%{}%".format(category)
+        products_query = products_query.filter(Products.category.ilike(category))
+    
+    if maxprice:
+        products_query = products_query.filter(Products.price <= maxprice)
+    
+    if search:
+        products_query = products_query.filter(Products.title.ilike(f'%{search}%'))
+    
+    # Пагинация
+    products = products_query.paginate(page=page, per_page=PER_PAGE, error_out=False)
     max_price = db.session.query(func.max(Products.price)).scalar()
+
+
+
     if request.method == 'POST':
         title = request.form.get('title')
         subText = request.form.get('subText')
@@ -141,21 +167,7 @@ def catalog():
         flash("Запись добавлена!", category="ok")
         return redirect(url_for("catalog"))
     
-    if request.method == 'GET':
-        category = request.args.get('category')
-        search = request.args.get('search')
-        maxprice = request.args.get('maxprice')
-        if category or maxprice:
-            category= category.capitalize()
-            category = "%{}%".format(category)
-            products = Products.query.filter((Products.category.ilike(category)) & (Products.price <= maxprice)).all()
-            return render_template("catalog.html",products=products,max_price=max_price)
-        elif search:
-            products = Products.query.filter(Products.title.ilike(f'%{search}%')).all()
-            return render_template("catalog.html",products=products,search=search,max_price=max_price)
-        
-        else:
-             return render_template("catalog.html",products=products,max_price=max_price)
+ 
     
     return render_template("catalog.html",products=products,max_price=max_price)
 
