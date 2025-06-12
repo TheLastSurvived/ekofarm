@@ -17,6 +17,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import mm
 from reportlab.lib.colors import black
+from flask_migrate import Migrate
 
 
 app = Flask(__name__)
@@ -28,6 +29,7 @@ app.config['UPLOAD_FOLDER'] = 'static/img/upload'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 db = SQLAlchemy(app)
 ckeditor = CKEditor(app)
+migrate = Migrate(app, db)
 
 
 class Users(db.Model):
@@ -52,6 +54,7 @@ class Products(db.Model):
     image_name = db.Column(db.String(100))
     category = db.Column(db.String(100))
     price = db.Column(db.Integer)
+   
     
     orders = db.relationship('Orders', backref='product', lazy=True)
     
@@ -81,6 +84,21 @@ class Reports(db.Model):
         return 'Reports %r' % self.id
 
 
+class Reviews(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
+    id_product = db.Column(db.Integer, db.ForeignKey('products.id'))
+    rating = db.Column(db.Integer)  # Оценка от 1 до 5
+    text = db.Column(db.Text)
+    date = db.Column(db.DateTime, default=datetime.now)
+    
+    user = db.relationship('Users', backref='reviews')
+    product = db.relationship('Products', backref='reviews')
+
+    def __repr__(self):
+        return f'Review {self.id}'
+
+
 class AdminIndex(AdminIndexView):
     @expose('/', methods=['GET', 'POST'])
     def index(self):
@@ -103,6 +121,12 @@ class OrdersView(ModelView):
     column_list = ['id','id_user','id_product', 'count_products', 'status', 'date']
 
 
+class ReviewsView(ModelView):
+    column_display_pk = True 
+    column_hide_backrefs = False
+    column_list = ['id','id_user','id_product','rating','text','date']
+
+
 class ReportsView(ModelView):
     column_display_pk = True 
     column_hide_backrefs = False
@@ -113,6 +137,7 @@ admin.add_view(ModelView(Users, db.session))
 admin.add_view(ModelView(Products, db.session))
 admin.add_view(OrdersView(Orders, db.session))
 admin.add_view(ReportsView(Reports, db.session))
+admin.add_view(ReviewsView(Reviews, db.session))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -127,13 +152,17 @@ PER_PAGE = 9
 @app.route('/catalog', methods=['GET', 'POST'])
 def catalog():
     page = request.args.get('page', 1, type=int)
-    products_query = Products.query
+    products_query = db.session.query(
+        Products,
+        db.func.avg(Reviews.rating).label('avg_rating')
+    ).outerjoin(Reviews, Products.id == Reviews.id_product).group_by(Products.id)
     
     # Фильтрация
     category = request.args.get('category')
-    search = request.args.get('search')
+    search_query = request.args.get('search')
     maxprice = request.args.get('maxprice')
-    
+    sort = request.args.get('sort')
+
     if category:
         category = category.capitalize()
         category = "%{}%".format(category)
@@ -142,13 +171,22 @@ def catalog():
     if maxprice:
         products_query = products_query.filter(Products.price <= maxprice)
     
-    if search:
-        products_query = products_query.filter(Products.title.ilike(f'%{search}%'))
+    if search_query:
+        products_query = products_query.filter(Products.title.contains(search_query))
+
+     # Сортировка
+    if sort == 'price_asc':
+        products_query = products_query.order_by(Products.price.asc())
+    elif sort == 'price_desc':
+        products_query = products_query.order_by(Products.price.desc())
+    elif sort == 'popular':
+        products_query = products_query.order_by(db.func.avg(Reviews.rating).desc())
+    else:
+        products_query = products_query.order_by(Products.id.asc())
     
     # Пагинация
     products = products_query.paginate(page=page, per_page=PER_PAGE, error_out=False)
     max_price = db.session.query(func.max(Products.price)).scalar()
-
 
 
     if request.method == 'POST':
@@ -169,12 +207,25 @@ def catalog():
     
  
     
-    return render_template("catalog.html",products=products,max_price=max_price)
+    return render_template("catalog.html", products=products, max_price=max_price, search=search_query)
 
 
 @app.route('/product/<int:id>', methods=['GET', 'POST'])
 def product(id):
     product = Products.query.get(id)
+
+    # Рассчитываем средний рейтинг
+    avg_rating = db.session.query(
+        db.func.avg(Reviews.rating)
+    ).filter(Reviews.id_product == id).scalar()
+
+    
+    
+    # Округляем до 1 знака после запятой
+    avg_rating = round(avg_rating, 1) if avg_rating else 0
+
+    
+
     if request.method == 'POST':
         product.title = request.form.get('title')
         product.category = request.form.get('category')
@@ -190,7 +241,9 @@ def product(id):
         db.session.commit()
         flash("Запись обновлена!", category="ok")
         return redirect(url_for("product", id=product.id))
-    return render_template("product.html",product=product)
+    product.reviews = sorted(product.reviews, key=lambda x: x.date, reverse=True)
+    return render_template("product.html",product=product,avg_rating=avg_rating,
+        reviews_count=len(product.reviews))
 
 
 @app.route('/delete-product/<int:id>')
@@ -200,6 +253,15 @@ def delete_article(id):
     db.session.commit()
     flash("Запись удалена!", category="bad")
     return redirect('/catalog')
+
+
+@app.route('/delete-review/<int:id_review>/<int:id_product>')
+def delete_review(id_review, id_product):
+    obj = Reviews.query.filter_by(id=id_review).first()
+    db.session.delete(obj)
+    db.session.commit()
+    flash("Отзыв удален!", category="bad")
+    return redirect(url_for("product", id=id_product))
 
 
 @app.route('/cart', methods=['GET', 'POST'])
@@ -364,6 +426,33 @@ def add_to_cart(id_user,id_product):
     return redirect(url_for("product", id=id_product))
 
 
+@app.route('/add-review/<int:product_id>', methods=['POST'])
+def add_review(product_id):
+    if 'name' not in session:
+        abort(401)
+    
+    user = Users.query.filter_by(email=session['name']).first()
+    rating = request.form.get('rating')
+    text = request.form.get('text')
+    
+    if not rating or not text:
+        flash('Пожалуйста, заполните все поля', 'bad')
+        return redirect(url_for('product', id=product_id))
+    
+    review = Reviews(
+        id_user=user.id,
+        id_product=product_id,
+        rating=int(rating),
+        text=text
+    )
+    
+    db.session.add(review)
+    db.session.commit()
+    
+    flash('Спасибо за ваш отзыв!', 'ok')
+    return redirect(url_for('product', id=product_id))
+
+
 @app.route('/about', methods=['GET', 'POST'])
 def about():
     return render_template("about.html")
@@ -403,7 +492,8 @@ def reg():
             surname = request.form.get('name')
             email = request.form.get('email')
             password = request.form.get('password')
-            user = Users(name=name,surname=surname,email=email,password=md5(password.encode()).hexdigest())
+            is_seller = 2 if request.form.get('is_seller') else 0
+            user = Users(name=name,surname=surname,email=email,password=md5(password.encode()).hexdigest(),root=is_seller )
             db.session.add(user)
             db.session.commit()
             flash("Регистрация прошла успешно!", category="ok")

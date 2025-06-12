@@ -37,3 +37,4 @@ visitor
 Werkzeug           
 WTForms 
 reportlab
+Flask-Migrate

@@ -80,7 +80,6 @@ body {
   max-width: 100px;
 }
 
-
 .login-form {
   max-width: 400px;
   margin: 100px auto;
@@ -111,7 +110,6 @@ body {
   text-decoration: underline;
 }
 
-
 .flash.ok {
   color: #198754;
   font-weight: bold;
@@ -122,12 +120,9 @@ body {
   font-weight: bold;
 }
 
-.cke_notifications_area{
+.cke_notifications_area {
   display: none;
 }
-
-
-
 
 .cart-container {
   background-color: #f8f9fa;
@@ -173,7 +168,6 @@ body {
   color: #28a745;
 }
 
-
 .pagination {
   margin-top: 20px;
 }
@@ -191,21 +185,186 @@ body {
   color: #198754;
 }
 
+html,
+body {
+  height: 100%;
+}
 
-html, body {
-    height: 100%;
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Используем viewport height */
+}
+
+.content {
+  flex: 1 0 auto; /* Это заставляет контент занимать всё доступное пространство */
+}
+
+footer {
+  flex-shrink: 0; /* Предотвращает сжатие футера */
+}
+
+/* Стили для звезд рейтинга */
+.rating {
+  color: #ffc107;
+  font-size: 1.2rem;
+}
+
+.rating-input {
+  direction: rtl;
+  unicode-bidi: bidi-override;
+}
+
+.rating-input input {
+  display: none;
+}
+
+.rating-input label {
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.rating-input input:checked ~ label,
+.rating-input label:hover,
+.rating-input label:hover ~ label {
+  color: #ffc107;
+}
+
+.review-card {
+  border-left: 3px solid #28a745;
+  padding-left: 15px;
+  margin-bottom: 20px;
+}
+
+/* Стили для отзывов */
+.review-card {
+  background: white;
+  border-left: 4px solid #28a745;
+  transition: transform 0.2s;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+}
+
+.avatar {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rating-badge {
+  font-size: 0.9rem;
+  background-color: #28a745 !important;
+}
+
+.review-text {
+  line-height: 1.6;
+  color: #333;
+}
+
+.empty-reviews {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Стили для звездного рейтинга */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  color: #ddd;
+  font-size: 1.5rem;
+  padding: 0 3px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: #ffc107;
+}
+
+.star-rating input:checked + label {
+  color: #ffc107;
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+  .review-card {
+    padding: 1rem;
   }
-  
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Используем viewport height */
+
+  .star-rating label {
+    font-size: 1.2rem;
   }
-  
-  .content {
-    flex: 1 0 auto; /* Это заставляет контент занимать всё доступное пространство */
-  }
-  
-  footer {
-    flex-shrink: 0; /* Предотвращает сжатие футера */
-  }
+}
+
+.badge.bg-success {
+  padding: 0.35em 0.65em;
+  font-size: 0.875em;
+  font-weight: 600;
+}
+.product-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.product-card .card-body {
+  flex-grow: 1;
+}
+
+.rating-badge {
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.rating-badge small {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+.star-rating {
+  display: inline-block;
+  font-size: 1.5rem;
+  unicode-bidi: bidi-override;
+  direction: rtl;
+}
+.star-rating input {
+  display: none;
+}
+.star-rating label {
+  color: #ddd;
+  cursor: pointer;
+}
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: #ffc107;
+}
+.star-rating input:checked + label {
+  color: #ffc107;
+}
+
+
+.rating-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2e7d32;
+    }

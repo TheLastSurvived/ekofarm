@@ -102,9 +102,22 @@
       <div class="col-md-6">
         <div class="product-info">
           <h1>{{product.title}}</h1>
-          <p class="text-muted">Категория: {{product.category}}</p>
-          <p class="price">{{product.price}} {%if not product.title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
-          <p>{{product.subText}}</p>
+        <p class="text-muted">Категория: {{product.category}}</p>
+        <div class="d-flex align-items-center mb-2">
+            <p class="price mb-0 me-3">{{product.price}} {%if not product.title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
+            <!-- Блок с рейтингом -->
+            <div class="d-flex align-items-center">
+                {% if reviews_count > 0 %}
+                <div class="rating-badge bg-success text-white px-2 py-1 rounded me-2">
+                    {{ avg_rating }} ★
+                </div>
+                <small class="text-muted">({{ reviews_count }} отзывов)</small>
+                {% else %}
+                <small class="text-muted">Нет отзывов</small>
+                {% endif %}
+            </div>
+        </div>
+        <p>{{product.subText}}</p>
           {%if 'name' in session %}
           <form method="post" action="{{url_for('add_to_cart', id_user=active_user.id, id_product=product.id)}}">
             <div class="mb-3">
@@ -128,6 +141,79 @@
         {% autoescape false %} {{product.text}} {% endautoescape %}
       </div>
     </div>
+
+
+    <!-- Отзывы -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="mb-4">Отзывы покупателей</h3>
+        
+        <!-- Список отзывов -->
+        <div class="reviews-list mb-5">
+            {% for review in product.reviews %}
+            <div class="review-card mb-4 p-4 rounded shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center">
+                        
+                        <div>
+                            <h5 class="mb-0">{{ review.user.name }}</h5>
+                            <small class="text-muted">{{ review.date.strftime('%d.%m.%Y в %H:%M') }}</small>
+                        </div>
+                    </div>
+                    <div class="rating-badge bg-success text-white px-2 py-1 rounded">
+                        {{ review.rating }} ★
+                       
+                    </div>
+                    
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <p class="review-text mb-0">{{ review.text }}</p>
+                  {%if 'name' in session and active_user.root==1 %}
+                 <a href="/delete-review/{{review.id}}/{{product.id}}" class="btn btn-danger">Удалить</a>
+                 {%endif%}
+                </div>
+                
+            </div>
+            {% else %}
+            <div class="empty-reviews text-center py-5 bg-light rounded">
+                <i class="bi bi-chat-square-text fs-1 text-muted"></i>
+                <p class="mt-3">Пока нет отзывов. Будьте первым!</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Форма отзыва -->
+        <div class="add-review-form bg-light p-4 rounded shadow-sm">
+            <h4 class="mb-4">Оставить отзыв</h4>
+            {% if 'name' in session %}
+            <form method="post" action="{{ url_for('add_review', product_id=product.id) }}">
+                <div class="mb-4">
+                    <label class="form-label d-block">Ваша оценка</label>
+                    <div class="star-rating">
+                        {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="star{{i}}" name="rating" value="{{i}}" {% if i == 5 %}checked{% endif %}>
+                        <label for="star{{i}}" title="{{i}} звезд"> ★</label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="reviewText" class="form-label">Ваш отзыв</label>
+                    <textarea class="form-control" id="reviewText" name="text" rows="4" 
+                              placeholder="Поделитесь вашим мнением о товаре..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="bi bi-send-fill me-2"></i>Отправить отзыв
+                </button>
+            </form>
+            {% else %}
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Чтобы оставить отзыв, пожалуйста <a href="/login" class="alert-link">войдите</a> в систему.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
   </div>
 
  

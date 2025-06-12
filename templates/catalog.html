@@ -8,7 +8,7 @@
 {{ ckeditor.load() }}
 <!-- Основной контент -->
 <div class="container my-5">
-  {%if 'name' in session and active_user.root==1%}
+  {%if 'name' in session and active_user.root==1 or active_user.root==2%}
   <button
   type="button"
   class="btn btn-success mb-3"
@@ -95,6 +95,15 @@
             <option value="Товары для фермеров" {% if request.args.get('category') == 'Товары для фермеров' %}selected{% endif %}>Товары для фермеров</option>
           </select>
         </div>
+        <div class="mb-3">
+          <label for="sort" class="form-label">Сортировка</label>
+          <select class="form-select" id="sort" name="sort">
+            <option value="">По умолчанию</option>
+            <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Цена по возрастанию</option>
+            <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>Цена по убыванию</option>
+            <option value="popular" {% if request.args.get('sort') == 'popular' %}selected{% endif %}>По популярности</option>
+          </select>
+        </div>
           <div class="mb-3">
             <label for="priceRange" class="form-label">Цена</label>
             <input
@@ -120,30 +129,45 @@
       <h2>Каталог товаров</h2>
 
       <div class="row">
-        {%if search%}
-          <p class="h5">Результаты поиска по запросу: {{search.replace('%', '').lower()}}</p>
-        {%endif%}
-
-        {%if not products%}
-          <h6>Список пуст!</h6>
-        {%endif%}
+        {% if search %}
+        <p class="h5">Результаты поиска по запросу: "{{ search }}"</p>
+        {% if not products.items %}
+            <div class="col-12">
+                <div class="alert alert-info">Товары по запросу "{{ search }}" не найдены</div>
+            </div>
+        {% endif %}
+    {% endif %}
         <!-- Карточка товара 1 -->
          {%for product in products.items%}
         <div class="col-md-4 mb-4">
-          <div class="card product-card">
-            <img
-              src="../static/img/upload/{{product.image_name}}"
-              alt="{{product.title}}"
-            />
-            <div class="card-body">
-              <h5 class="card-title">{{product.title}}</h5>
-              <p class="card-text"><small>{{product.category}}</small>
-              <p class="card-text">{{product.price}} {%if not product.title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
-              
-              <a href="/product/{{product.id}}" class="btn btn-success w-100">Просмотр</a>
-            </div>
-          </div>
-        </div>
+  <div class="card product-card">
+    <img
+      src="../static/img/upload/{{product[0].image_name}}"
+      alt="{{product[0].title}}"
+    />
+    <div class="card-body">
+      <h5 class="card-title">{{product[0].title}}</h5>
+      <p class="card-text"><small>{{product[0].category}}</small>
+      <p class="card-text">{{product[0].price}} {%if not product[0].title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
+      
+      <!-- Добавляем рейтинг -->
+      {% if product[1] %}
+      <div class="mb-2">
+        <span class="badge bg-success text-white">
+          {{ "%.1f"|format(product[1]) }} ★
+        </span>
+        <small class="text-muted">(Кол-во отзывов: {{ product[0].reviews|length }})</small>
+      </div>
+      {% else %}
+      <div class="mb-2">
+        <small class="text-muted">Нет отзывов</small>
+      </div>
+      {% endif %}
+      
+      <a href="/product/{{product[0].id}}" class="btn btn-success w-100">Просмотр</a>
+    </div>
+  </div>
+</div>
         {%endfor%}
       </div>
 
@@ -180,4 +204,7 @@
     </div>
   </div>
 </div>
+
+
+
 {% endblock %}
