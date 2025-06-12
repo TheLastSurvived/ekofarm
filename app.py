@@ -361,7 +361,14 @@ def buy_all():
         if order.status == 0:  # Фильтруем по статусу продукта
             c.setFont("Roboto", 12)
             # Переносим длинные строки на новую строку
-            product_info = f"Товар: {order.product.title}, Количество: {order.count_products}, Цена: {order.product.price} руб."
+            product_info = f"Товар: {order.product.title}, Количество: {order.count_products} "
+            if order.product.title == "Свежее молоко":
+                product_info += "л"
+            elif order.product.title == "Эко газон 'Зеленый ковер'":
+                product_info += "м²"
+            else:
+                product_info += "кг"
+            product_info += f", Цена: {order.product.price} руб."
             lines = []
             max_line_length = 80  # Максимальная длина строки
             while len(product_info) > max_line_length:

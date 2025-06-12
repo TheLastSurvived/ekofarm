@@ -148,7 +148,7 @@
     <div class="card-body">
       <h5 class="card-title">{{product[0].title}}</h5>
       <p class="card-text"><small>{{product[0].category}}</small>
-      <p class="card-text">{{product[0].price}} {%if not product[0].title=="Свежее молоко"%}руб/кг{%else%}руб/л {%endif%}</p>
+      <p class="card-text">{{product[0].price}} {%if product[0].title=="Свежее молоко"%}руб/л{%elif product[0].title=="Эко газон 'Зеленый ковер'"%}руб/м2{%else%}руб/кг{%endif%}</p>
       
       <!-- Добавляем рейтинг -->
       {% if product[1] %}

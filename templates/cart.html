@@ -100,12 +100,12 @@
                                     <input type="email" id="disabledTextInput" value="{{active_user.email}}" class="form-control" name="email" placeholder="Email" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="disabledTextInput" class="form-label">Укажите вас адрес</label>
+                                    <label for="disabledTextInput" class="form-label">Укажите ваш адрес</label>
                                     <input type="text" id="disabledTextInput" value="" class="form-control" name="address" placeholder="Адрес" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="disabledTextInput" class="form-label">Укажите ваш номер телефона</label>
-                                    <input type="number" id="disabledTextInput" value="" class="form-control" name="phone_number" placeholder="Номер телефона" required>
+                                    <label for="disabledTextInput" class="form-label">Укажите ваш номер телефона (Формат: 375ХХХХХХХХХ)</label>
+                                    <input type="tel" id="disabledTextInput" pattern="375\d{9}" value="" class="form-control" name="phone_number" placeholder="Номер телефона" required>
                                 </div>
                         </div>
                         <div class="modal-footer">
